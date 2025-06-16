@@ -1,9 +1,10 @@
 import re
 from icalendar import Calendar, Event
 from datetime import datetime, timedelta
+from typing import Optional, List, Dict, Tuple
 
 
-def parse_datetime(date_str, time_str):
+def parse_datetime(date_str: str, time_str: str) -> Optional[datetime]:
     date_match = re.search(r"\w+, (\w+ \d+, \d{4})", date_str)
     if not date_match:
         return None
@@ -25,7 +26,9 @@ def parse_datetime(date_str, time_str):
     return datetime(date_obj.year, date_obj.month, date_obj.day, hour, 0)
 
 
-def create_icalendar(mapped_events):
+def create_icalendar(
+    mapped_events: List[Dict[str, List[Tuple[str, str]]]]
+) -> Calendar:
     cal = Calendar()
     cal.add('prodid', '-//Calendar//')
     cal.add('version', '2.0')
@@ -48,6 +51,6 @@ def create_icalendar(mapped_events):
     return cal
 
 
-def save_calendar_to_file(calendar, filename="calendar.ics"):
+def save_calendar_to_file(calendar: Calendar, filename: str = "calendar.ics") -> None:
     with open(filename, "wb") as f:
         f.write(calendar.to_ical())

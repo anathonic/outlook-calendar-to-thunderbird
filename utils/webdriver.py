@@ -1,20 +1,22 @@
 import re
 import time
+from typing import List, Tuple, Dict
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 
-def init_driver():
+def init_driver() -> WebDriver:
     options = Options()
     options.add_argument("--profile-directory=Default")
     driver = webdriver.Chrome(options=options)
     return driver
 
 
-def login(driver, owa_url, username, password):
+def login(driver: WebDriver, owa_url: str, username: str, password: str) -> None:
     driver.get(owa_url)
     time.sleep(2)
     try:
@@ -28,7 +30,7 @@ def login(driver, owa_url, username, password):
         exit()
 
 
-def fetch_calendar_events(driver, owa_url):
+def fetch_calendar_events(driver: WebDriver, owa_url: str) -> Tuple[List[str], List[Tuple[str, str]]]:
     driver.get(owa_url + "/#path=/calendar/view/Month")
     time.sleep(5)
 
@@ -36,7 +38,7 @@ def fetch_calendar_events(driver, owa_url):
     days = driver.find_elements(By.CSS_SELECTOR, "div._wx_42")
     dates = [day.get_attribute("aria-label") for day in days]
 
-    all_events = []
+    all_events: List[Tuple[str, str]] = []
     for event in events:
         try:
             time_elem = event.find_element(By.CSS_SELECTOR, "span._cb_Y1")
@@ -50,8 +52,8 @@ def fetch_calendar_events(driver, owa_url):
     return dates, all_events
 
 
-def map_events_to_days(dates, all_events):
-    mapped = []
+def map_events_to_days(dates: List[str], all_events: List[Tuple[str, str]]) -> List[Dict[str, List[Tuple[str, str]]]]:
+    mapped: List[Dict[str, List[Tuple[str, str]]]] = []
     event_index = 0
 
     for date_text in dates:
